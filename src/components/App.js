@@ -45,6 +45,7 @@ class App extends Component {
       
       // console.log(abi)
       // console.log(contract);
+      this.setState({contract:contract})
       let posts =  await contract.methods.GetPosts.call()
       this.setState({posts: posts})
       console.log(posts)
@@ -59,6 +60,7 @@ class App extends Component {
     
     this.ClosePopup = this.ClosePopup.bind(this)
     this.onChangeText = this.onChangeText.bind(this)
+    this.onSubmit= this.onSubmit.bind(this)
 
     this.state ={
       
@@ -71,6 +73,16 @@ class App extends Component {
     }
   }
 
+  async onSubmit(){
+
+    let contract = this.state.contract;
+    this.setState({popup:false})
+
+    await contract.methods.AddPost("john", this.state.text).send({from:this.state.account});
+
+    // this.ClosePopup();
+  }
+
   LoadPosts(){
 
     return this.state.posts.map((post) => {
@@ -78,16 +90,29 @@ class App extends Component {
       return(
           <div style={{}}>
 
-              <Card style={{width:"500px", marginLeft:'200px'}}>
-                <Card.Body style={{marginLeft:'30px'}}>
+              <Card style={{width:"500px", marginLeft:'25%'}}>
+                <Card.Body style={{marginLeft:'20px'}}>
                     <Card.Title style={{}}>
                         {post.Username}
                     </Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">{post.User}</Card.Subtitle>
+                    <br/>
                     <Card.Text>
                       {post.Text}
                     </Card.Text>
                 </Card.Body>
+                <div>
+                  <button 
+                    style={{
+                      marginLeft:"400px" ,
+                      background:'transparent', 
+                      border:'transparent', 
+                      color: 'grey'
+                    }} 
+                  >
+                      comments
+                  </button>
+                </div>
               </Card>
               <br/>
           </div>
@@ -96,6 +121,8 @@ class App extends Component {
       );
     });
   }
+
+
   NavBar(){
     
       return(
