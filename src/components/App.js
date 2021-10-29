@@ -46,9 +46,17 @@ class App extends Component {
       // console.log(abi)
       // console.log(contract);
       this.setState({contract:contract})
+      
       let posts =  await contract.methods.GetPosts.call()
       this.setState({posts: posts})
-      console.log(posts)
+
+      let comments = await this.state.contract.methods.GetAllComments().call({from: this.state.account})
+        
+      this.setState({comments : comments});
+      // console.log(this.state.comments)
+
+      
+     
     }else{
       alert("error")
     }
@@ -61,15 +69,16 @@ class App extends Component {
     this.ClosePopup = this.ClosePopup.bind(this)
     this.onChangeText = this.onChangeText.bind(this)
     this.onSubmit= this.onSubmit.bind(this)
+    this.AddComment = this.AddComment.bind(this)
 
     this.state ={
       
       account: '',
       contract: null,
       posts : [] ,
-      comments: [],
       ClosePopup:false,
-      text:""
+      text:"",
+      comments:[]
     }
   }
 
@@ -83,14 +92,56 @@ class App extends Component {
     // this.ClosePopup();
   }
 
+  
+  async getComments(id){
+    let comments = await this.state.contract.methods.GetComments(id).call({from: this.state.account});
+    return comments;
+
+  }
+
+  GetPostComments(id){
+    let comments = this.state.comments;
+
+    let array=[];
+    for(let comment of comments){
+      if(comment.PostId === id){
+        array.push(comment);
+      }
+    }
+    return array;
+  }
+
+  LoadComments(id){
+    
+    // console.log(id);
+    // 
+    // console.log(comments)
+    
+    let comments = this.GetPostComments(id);
+    
+    return this.state.comments.map((comment) => {
+      return(
+          <div style={{marginLeft:'30px', marginRight:'30px'}}>
+              <h6>{comment.Username} </h6>
+              <h6 style={{color:'grey'}}>{comment.User} </h6>
+              {comment.Text}
+              <hr />
+          </div>
+
+        
+      );
+    });
+  }
+
   LoadPosts(){
 
     return this.state.posts.map((post) => {
-            
+      
       return(
+
           <div style={{}}>
 
-              <Card style={{width:"500px", marginLeft:'25%'}}>
+              <Card style={{width:"50%", marginLeft:'25%'}}>
                 <Card.Body style={{marginLeft:'20px'}}>
                     <Card.Title style={{}}>
                         {post.Username}
@@ -104,7 +155,7 @@ class App extends Component {
                 <div>
                   <button 
                     style={{
-                      marginLeft:"400px" ,
+                      marginLeft:"80%" ,
                       background:'transparent', 
                       border:'transparent', 
                       color: 'grey'
@@ -112,6 +163,10 @@ class App extends Component {
                   >
                       comments
                   </button>
+                  <hr />
+                  <div>
+                       {this.LoadComments()}
+                  </div>
                 </div>
               </Card>
               <br/>
@@ -153,6 +208,7 @@ class App extends Component {
                     border:'transparent', 
                     color: 'white'
                   }} 
+                  
                   onClick={()=>{ this.setState({popup:true})} }
                 >New Post</button>
               </Col>
@@ -177,6 +233,10 @@ class App extends Component {
       text:"",
     })
 }
+  AddComment(e){
+    
+    e.preventDefault();
+  }
 
   AddPost(props){
     return(
@@ -231,7 +291,7 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <div style={{backgroundColor:'#EEE'}}>
         {this.NavBar()}
         <br/>
         {this.AddPost()}
