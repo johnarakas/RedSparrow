@@ -36,11 +36,13 @@ class App extends Component {
     const networkId = await web3.eth.net.getId();
 
     const networkData = RedSparrow.networks[networkId]
-
+    
     if(networkData){
       
       const abi  = RedSparrow.abi
       const address  = networkData.address
+      // alert(address)
+      // alert(abi)
       const contract = new web3.eth.Contract(abi, address);
       
       // console.log(abi)
@@ -49,6 +51,7 @@ class App extends Component {
       
       let posts =  await contract.methods.GetPosts.call()
       this.setState({posts: posts})
+      // console.log(posts)
 
       let comments = await this.state.contract.methods.GetAllComments().call({from: this.state.account})
         
@@ -68,6 +71,7 @@ class App extends Component {
     
     this.ClosePopup = this.ClosePopup.bind(this)
     this.onChangeText = this.onChangeText.bind(this)
+    this.onChangeTextComment = this.onChangeTextComment.bind(this)
     this.onSubmit= this.onSubmit.bind(this)
     this.AddComment = this.AddComment.bind(this)
 
@@ -78,6 +82,7 @@ class App extends Component {
       posts : [] ,
       ClosePopup:false,
       text:"",
+      text_comment:"",
       comments:[]
     }
   }
@@ -115,21 +120,25 @@ class App extends Component {
     
     // console.log(id);
     // 
-    // console.log(comments)
     
-    let comments = this.GetPostComments(id);
+    let comments = this.GetPostComments(0);
     
     return this.state.comments.map((comment) => {
-      return(
-          <div style={{marginLeft:'30px', marginRight:'30px'}}>
-              <h6>{comment.Username} </h6>
-              <h6 style={{color:'grey'}}>{comment.User} </h6>
-              {comment.Text}
-              <hr />
-          </div>
+      let i  = parseInt(comment.PostId , 16)
 
-        
-      );
+      if(i == id){
+        return(
+            <div style={{marginLeft:'30px', marginRight:'30px'}}>
+                <h6>{comment.Username} </h6>
+                <h6 style={{color:'grey'}}>{comment.User} </h6>
+                {comment.Text}
+                <hr />
+            </div>
+
+          
+        );
+      }
+    
     });
   }
 
@@ -146,11 +155,31 @@ class App extends Component {
                     <Card.Title style={{}}>
                         {post.Username}
                     </Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">{post.User}</Card.Subtitle>
+                    {/* <Card.Subtitle className="mb-2 text-muted">{post.User}</Card.Subtitle> */}
                     <br/>
                     <Card.Text>
                       {post.Text}
                     </Card.Text>
+                    <br/>
+                    <hr/>
+                    <Form onSubmit={()=>this.AddComment(post.PostId)}>
+                      <Container>
+                        <Row>
+                          <Col sm={10} >
+                            <Form.Control 
+                                type="text" 
+                                required="required" 
+                                placeholder="Add a comment..."
+                                
+                                value={this.state.text_comment}
+                                onChange={this.onChangeTextComment} 
+                            />
+                          </Col>
+                          <Col sm={2}><Button type="submit">Post</Button></Col>
+                        </Row>
+                      </Container>
+                    </Form>
+
                 </Card.Body>
                 <div>
                   <button 
@@ -165,7 +194,7 @@ class App extends Component {
                   </button>
                   <hr />
                   <div>
-                       {this.LoadComments()}
+                       {this.LoadComments(post.PostId)}
                   </div>
                 </div>
               </Card>
@@ -225,6 +254,11 @@ class App extends Component {
       text: e.target.value
     });
   }
+  onChangeTextComment(e){
+    this.setState({
+      text_comment: e.target.value
+    });
+  }
   ClosePopup(e){
     e.preventDefault();
     this.setState({popup:false})
@@ -233,9 +267,20 @@ class App extends Component {
       text:"",
     })
 }
-  AddComment(e){
+
+
+  async AddComment(post_id){
     
-    e.preventDefault();
+    // e.preventDefault();
+    // alert(post_id);
+    // alert(this.state.text_comment)
+    
+    let contract = this.state.contract;
+        
+    // uint256  id,
+    // string memory username,
+    // string memory text
+    await contract.methods.AddComment( post_id ,"johnny", this.state.text_comment).send({from:this.state.account});
   }
 
   AddPost(props){
