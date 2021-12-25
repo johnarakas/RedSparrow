@@ -94,11 +94,27 @@ class App extends Component {
       comments:[],
 
       Username:"Anonymous",
-      ImageUrl:"",
+      ImageUrl:"../person.png",
       Info:"no information available"
     }
   }
 
+  async EditUser(username , info , image_url){
+      
+    //https://scontent.fath2-1.fna.fbcdn.net/v/t1.6435-1/p240x240/116719666_1553777208125259_2586934997729702440_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=7206a8&_nc_eui2=AeHkcRTwMFdw6CwRlkRSviKTfdUF4wY4ppR91QXjBjimlNBpp4J8pvUFKWUO6emblESP25bFYWQvw3PNSlavkbbp&_nc_ohc=lmIn2hiVZ88AX8tP5tS&_nc_ht=scontent.fath2-1.fna&oh=00_AT-De0WAe6kKysKnbFXj93mEWzSDLie123YcrPZlDLqZTQ&oe=61EAE019
+    
+    let contract = this.state.contract;
+
+    if(this.state.Username === "Anonymous"){
+
+      await contract.methods.AddUser(username , info , image_url).send({from:this.state.account});
+
+    }else{
+
+      await contract.methods.EditUser(username , info , image_url).send({from:this.state.account});
+
+    }
+  }
   async onSubmit(){
 
     let contract = this.state.contract;
@@ -127,6 +143,8 @@ class App extends Component {
     }
     return array;
   }
+
+
 
   LoadComments(id){
     
@@ -164,6 +182,7 @@ class App extends Component {
     });
   }
 
+  
   LoadPosts(){
 
     return this.state.posts.map((post) => {
@@ -175,7 +194,7 @@ class App extends Component {
               <Card style={{width:"80%", marginLeft:'25%'}}>
                 <Card.Body style={{marginLeft:'20px'}}>
                     <Card.Title style={{}}>
-                        <img src={profile_image}  style={{width:"50px", borderRadius:"100%" }}alt="user post picture"/> {post.Username}
+                        <img src={ profile_image }  style={{width:"50px", borderRadius:"100%" }}alt="user post picture"/> {post.Username}
                     </Card.Title>
                     {/* <Card.Subtitle className="mb-2 text-muted">{post.User}</Card.Subtitle> */}
                     <br/>
@@ -367,16 +386,21 @@ class App extends Component {
     return(
       <div style={{backgroundColor:"white", textAlign:"center"}}>
           <Container >
-            <Row style={{ marginLeft:"20px"}} >
-                <img src={profile_image} alt="profile picture" style={{width:"100px",height:"auto", textAlign:"center" , }} />
+            <Row style={{ marginLeft:"15px" }} >
+                <img src={this.LoadProfilePicture()} alt="profile picture" style={{width:"100px",height:"auto", textAlign:"center" ,borderRadius:"100%",  marginTop:"20px"}} />
             </Row>
-            <Row style={{ marginLeft:"20px"}}>
+            <Row className="justify-content-md-center">
               <h6>{this.state.Username }</h6>
               
             </Row>
-            <Row>
+            <Row className="justify-content-md-center">
               {this.state.Info}
             </Row>
+            <br/>
+            <Row className="justify-content-md-center">
+              <Button onClick={()=>{ this.EditUser("John Arakas" , "cs student ", "https://scontent.fath2-1.fna.fbcdn.net/v/t1.6435-1/p240x240/116719666_1553777208125259_2586934997729702440_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=7206a8&_nc_eui2=AeHkcRTwMFdw6CwRlkRSviKTfdUF4wY4ppR91QXjBjimlNBpp4J8pvUFKWUO6emblESP25bFYWQvw3PNSlavkbbp&_nc_ohc=lmIn2hiVZ88AX8tP5tS&_nc_ht=scontent.fath2-1.fna&oh=00_AT-De0WAe6kKysKnbFXj93mEWzSDLie123YcrPZlDLqZTQ&oe=61EAE019") }} >Edit</Button>
+            </Row>
+            <br/>
           </Container>
       </div>
     );
