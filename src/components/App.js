@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import logo from '../logo.png';
+import profile_image from '../person.png'
 import Web3 from 'web3'
 import './App.css';
 import RedSparrow from '../abis/RedSparrow.json'
@@ -52,11 +53,17 @@ class App extends Component {
       let posts =  await contract.methods.GetPosts.call()
       this.setState({posts: posts})
       
-
-      let comments = await this.state.contract.methods.GetAllComments().call({from: this.state.account})
-        
+      let comments = await this.state.contract.methods.GetAllComments().call({from: this.state.account})  
       this.setState({comments : comments});
+
+      let users = await this.state.contract.methods.GetUsers().call({from: this.state.account})  
+      this.setState({users : users});
       
+      for(var i = 0; i<users.length ; i++){
+        if(users[i].Address === this.state.account){
+            this.setState({Username:users[i].Username , Info:users[i].Info , ImageUrl:users[i].ImageUrl })
+        }
+      }
 
       
      
@@ -79,11 +86,16 @@ class App extends Component {
       
       account: '',
       contract: null,
+      users:[],
       posts : [] ,
       ClosePopup:false,
       text:"",
       text_comment:"",
-      comments:[]
+      comments:[],
+
+      Username:"Anonymous",
+      ImageUrl:"",
+      Info:"no information available"
     }
   }
 
@@ -129,9 +141,19 @@ class App extends Component {
       if(i == id){
         return(
             <div style={{marginLeft:'30px', marginRight:'30px'}}>
-                <h6>{comment.Username} </h6>
-                {/* <h6 style={{color:'grey'}}>{comment.User} </h6> */}
-                {comment.Text}
+                <Container>
+                    <Row>
+                      <img src={profile_image}  style={{width:"50px", borderRadius:"100%", marginTop:"-15px" }}alt="user post picture"/><h6>{comment.Username} </h6>
+                        {/* <h6 style={{color:'grey'}}>{comment.User} </h6> */}
+                  
+                    </Row>
+
+                    <Row>
+
+                      {comment.Text}
+                    
+                    </Row>
+                </Container>
                 <hr />
             </div>
 
@@ -150,10 +172,10 @@ class App extends Component {
 
           <div style={{}}>
 
-              <Card style={{width:"50%", marginLeft:'25%'}}>
+              <Card style={{width:"80%", marginLeft:'25%'}}>
                 <Card.Body style={{marginLeft:'20px'}}>
                     <Card.Title style={{}}>
-                        {post.Username}
+                        <img src={profile_image}  style={{width:"50px", borderRadius:"100%" }}alt="user post picture"/> {post.Username}
                     </Card.Title>
                     {/* <Card.Subtitle className="mb-2 text-muted">{post.User}</Card.Subtitle> */}
                     <br/>
@@ -324,7 +346,41 @@ class App extends Component {
         </Modal.Body>
       </Modal>
       );
-}
+  }
+
+  GetUser(Address){
+    for( var user of this.state.users ){
+      if(user.Address === Address){
+        return user;
+      }
+    }
+  }
+
+  LoadProfilePicture(){
+      if(this.state.ImageUrl !== ""){
+        return this.state.ImageUrl
+      }else{
+        return profile_image
+      }
+    };
+  LoadUser(){
+    return(
+      <div style={{backgroundColor:"white", textAlign:"center"}}>
+          <Container >
+            <Row style={{ marginLeft:"20px"}} >
+                <img src={profile_image} alt="profile picture" style={{width:"100px",height:"auto", textAlign:"center" , }} />
+            </Row>
+            <Row style={{ marginLeft:"20px"}}>
+              <h6>{this.state.Username }</h6>
+              
+            </Row>
+            <Row>
+              {this.state.Info}
+            </Row>
+          </Container>
+      </div>
+    );
+  }
 
   render() {
     return (
@@ -332,7 +388,20 @@ class App extends Component {
         {this.NavBar()}
         <br/>
         {this.AddPost()}
-        {this.LoadPosts()}
+        <Container>
+          <Row>
+            <Col sm={2}>
+              <div>
+                  {this.LoadUser()}
+              </div>
+            </Col>
+            <Col sm={10} style={{marginLeft:"-10%" }} >
+              {this.LoadPosts()}
+
+            </Col>
+          </Row>
+        
+        </Container>
       </div>
     );
   }
