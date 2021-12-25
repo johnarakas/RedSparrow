@@ -46,6 +46,19 @@ contract( 'RedSparrow', (accounts)=>{
           
         })
       })
+      describe('new, edit user', async () => {
+        it('create new user', async () => {
+          await contract.AddUser("john", "student","la");
+          await contract.EditUser("johnny", "student in csd","lala");
+
+          // let user = await contract.GetUser("0x718A94628b369e9C248cEDA2036a0e761cbCf27F");
+          // console.log(user);
+          let user1 = await contract.CheckIfuserExist("0x718A94628b369e9C248cEDA2036a0e761cbCf27F")
+          console.log(user1)
+
+          
+        })
+      })
 
 
 } )

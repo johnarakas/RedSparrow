@@ -51,12 +51,12 @@ class App extends Component {
       
       let posts =  await contract.methods.GetPosts.call()
       this.setState({posts: posts})
-      // console.log(posts)
+      
 
       let comments = await this.state.contract.methods.GetAllComments().call({from: this.state.account})
         
       this.setState({comments : comments});
-      // console.log(this.state.comments)
+      
 
       
      
@@ -130,7 +130,7 @@ class App extends Component {
         return(
             <div style={{marginLeft:'30px', marginRight:'30px'}}>
                 <h6>{comment.Username} </h6>
-                <h6 style={{color:'grey'}}>{comment.User} </h6>
+                {/* <h6 style={{color:'grey'}}>{comment.User} </h6> */}
                 {comment.Text}
                 <hr />
             </div>
@@ -182,18 +182,10 @@ class App extends Component {
 
                 </Card.Body>
                 <div>
-                  <button 
-                    style={{
-                      marginLeft:"80%" ,
-                      background:'transparent', 
-                      border:'transparent', 
-                      color: 'grey'
-                    }} 
-                  >
-                      comments
-                  </button>
+                 
                   <hr />
                   <div>
+
                        {this.LoadComments(post.PostId)}
                   </div>
                 </div>
