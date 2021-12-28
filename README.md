@@ -7,9 +7,9 @@ This is a simple project designed to show my knoledge in decentralized app devel
 RedSparrow Implements  Twitter basic functionalities (post, comment and one  simple profile) in Ethereum using Solidity and React
 
 ## Requirements
-    ` npm install `
+`npm install`
 
-    you will also need to install ganache and metamask account
+you will also need to install ganache and metamask account
 ## Deployment 
 
 `truffle migrate --reset`
